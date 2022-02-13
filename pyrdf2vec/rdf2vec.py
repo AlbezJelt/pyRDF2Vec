@@ -143,7 +143,7 @@ class RDF2VecTransformer:
         self.fit(self.get_walks(kg, entities), is_update)
         return self.transform(kg, entities)
 
-    def get_walks(self, kg: KG, entities: Entities) -> List[List[SWalk]]:
+    def get_walks(self, kg: KG, entities: Entities, randomness: float = 1) -> List[List[SWalk]]:
         """Gets the walks of an entity based on a Knowledge Graph and a
         list of walkers
 
@@ -152,6 +152,8 @@ class RDF2VecTransformer:
             entities: The entities including test entities to create the
                 embeddings. Since RDF2Vec is unsupervised, there is no label
                 leakage.
+            randomness: [Default = 1] the probability with which only sameAs links 
+                are extracted.
 
         Returns:
             The walks for the given entities.
@@ -171,6 +173,9 @@ class RDF2VecTransformer:
         if self.verbose == 2:
             print(kg)
             print(self.walkers[0])
+
+        print(f"Using randomness = {randomness}")
+        kg.connector.randomness = randomness
 
         walks: List[List[SWalk]] = []
         tic = time.perf_counter()

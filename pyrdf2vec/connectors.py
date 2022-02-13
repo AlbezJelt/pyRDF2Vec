@@ -13,6 +13,7 @@ import requests
 import sys
 from cachetools import Cache, TTLCache, cachedmethod
 from cachetools.keys import hashkey
+from random import random
 
 from pyrdf2vec.typings import Literal, Response
 
@@ -42,6 +43,13 @@ class Connector(ABC):
         type=Cache,
         factory=lambda: TTLCache(maxsize=1024, ttl=1200),
         validator=attr.validators.optional(attr.validators.instance_of(Cache)),
+    )
+
+    randomness = attr.ib(
+        kw_only=True,
+        type=float,
+        default=1,
+        validator=attr.validators.instance_of(float),
     )
 
     query_string = attr.ib(
@@ -179,8 +187,14 @@ class SPARQLConnector(Connector):
         if 'www.wikidata.org' in entity:
             query += "FILTER(CONTAINS(STR(?o), \"wikidata.org/entity/Q\")) "    
         else:
-            query += "FILTER EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } "
-        
+            if self.randomness >= random():
+                query += "FILTER EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } "
+            else:
+                query += "FILTER NOT EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } "
+                query += "FILTER(CONTAINS(STR(?o), \"http://dbpedia.org/resource/\")) "
+                query += "FILTER(!CONTAINS(STR(?o), \"http://dbpedia.org/resource/File:\")) . "
+                query += "FILTER(!CONTAINS(STR(?o), \"http://dbpedia.org/resource/Template:\")) . "
+
         query += "}"
         return query
 
