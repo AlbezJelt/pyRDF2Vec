@@ -157,13 +157,17 @@ class SPARQLConnector(Connector):
         else:
             url = f"{self.endpoint}{self.query_string}{parse.quote(query)}"
         
-        try:
-            with requests.get(url, headers = {'User-agent': 'gerry/1.0 (a.gherardi9@campus.unimib.it) pyrdf2vec/1.0'}) as res:
+        if self.endpoint == 'https://query.wikidata.org/sparql':
+            try:
+                with requests.get(url, headers = {'User-agent': 'gerry/1.0 (a.gherardi9@campus.unimib.it) pyrdf2vec/1.0'}) as res:
+                    return res.json()
+            except:
+                with requests.get(url, headers = {'User-agent': 'gerry/1.0 (a.gherardi9@campus.unimib.it) pyrdf2vec/1.0'}) as res:
+                    print(res.status_code)
+                    print(res.headers)
+        else:
+            with requests.get(url, headers = self._headers) as res:
                 return res.json()
-        except:
-            with requests.get(url, headers = {'User-agent': 'gerry/1.0 (a.gherardi9@campus.unimib.it) pyrdf2vec/1.0'}) as res:
-                print(res.status_code)
-                print(res.headers)
 
     def get_query(self, entity: str, preds: Optional[List[str]] = None, verbose: int = 0) -> str:
         """Gets the SPARQL query for an entity.
@@ -190,8 +194,8 @@ class SPARQLConnector(Connector):
             if self.randomness >= random():
                 query += "FILTER EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } "
             else:
-                query += "FILTER NOT EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } "
-                query += "FILTER(CONTAINS(STR(?o), \"http://dbpedia.org/resource/\")) "
+                query += "FILTER NOT EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } . "
+                query += "FILTER(CONTAINS(STR(?o), \"http://dbpedia.org/resource/\")) . "
                 query += "FILTER(!CONTAINS(STR(?o), \"http://dbpedia.org/resource/File:\")) . "
                 query += "FILTER(!CONTAINS(STR(?o), \"http://dbpedia.org/resource/Template:\")) . "
 
