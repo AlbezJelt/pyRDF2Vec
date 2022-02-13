@@ -1,6 +1,6 @@
 from hashlib import md5
 from typing import List, Optional, Set
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 
 import attr
 
