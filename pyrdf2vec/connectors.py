@@ -48,7 +48,7 @@ class Connector(ABC):
     randomness = attr.ib(
         kw_only=True,
         type=float,
-        default=1,
+        default=1.0,
         validator=attr.validators.instance_of(float),
     )
 
