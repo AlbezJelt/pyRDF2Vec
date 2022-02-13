@@ -9,7 +9,7 @@ import numpy as np
 import rdflib
 from cachetools import Cache, TTLCache, cachedmethod
 from cachetools.keys import hashkey
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 from pyrdf2vec.connectors import SPARQLConnector
 from pyrdf2vec.graphs.vertex import Vertex

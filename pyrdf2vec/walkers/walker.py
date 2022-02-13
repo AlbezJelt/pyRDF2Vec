@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 import attr
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 from pyrdf2vec.graphs import KG, Vertex
 from pyrdf2vec.samplers import Sampler, UniformSampler
@@ -152,13 +152,7 @@ class Walker(ABC):
             kg._fill_hops(entities)
 
         with multiprocessing.Pool(process, self._init_worker, [kg]) as pool:
-            res = list(
-                tqdm(
-                    pool.imap(self._proc, entities),
-                    total=len(entities),
-                    disable=True if verbose == 0 else False,
-                )
-            )
+            res = list(pool.imap(self._proc, entities))
         return self._post_extract(res)
 
     @abstractmethod
