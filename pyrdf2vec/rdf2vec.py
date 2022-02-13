@@ -174,8 +174,8 @@ class RDF2VecTransformer:
             print(kg)
             print(self.walkers[0])
 
-        print(f"Using randomness = {randomness}")
         kg.connector.randomness = randomness
+        print(f"Using randomness = {kg.connector.randomness}")
 
         walks: List[List[SWalk]] = []
         tic = time.perf_counter()

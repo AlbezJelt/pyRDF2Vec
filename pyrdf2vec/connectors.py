@@ -191,9 +191,12 @@ class SPARQLConnector(Connector):
         if 'www.wikidata.org' in entity:
             query += "FILTER(CONTAINS(STR(?o), \"wikidata.org/entity/Q\")) "    
         else:
-            if self.randomness >= random():
-                query += "FILTER EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } "
+            r = random()
+            if self.randomness >= r:
+                print(f"Searching sameAs link, random = {r}")
+                query += "FILTER EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } . "
             else:
+                print("Searching NOT sameAs link, random = {r}")
                 query += "FILTER NOT EXISTS { ?o owl:sameAs ?WikidataEntity . FILTER(CONTAINS(STR(?WikidataEntity), \"wikidata.org/entity\")) } . "
                 query += "FILTER(CONTAINS(STR(?o), \"http://dbpedia.org/resource/\")) . "
                 query += "FILTER(!CONTAINS(STR(?o), \"http://dbpedia.org/resource/File:\")) . "
