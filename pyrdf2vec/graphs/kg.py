@@ -10,6 +10,7 @@ import rdflib
 from cachetools import Cache, TTLCache, cachedmethod
 from cachetools.keys import hashkey
 from tqdm import tqdm
+from multiprocessing import Manager
 
 from pyrdf2vec.connectors import SPARQLConnector
 from pyrdf2vec.graphs.vertex import Vertex
@@ -159,6 +160,7 @@ class KG:
                 self.connector = SPARQLConnector(
                     self.location, cache=self.cache, query_string=self.query_string
                 )
+                self.hops_dict = Manager().dict()
             elif self.location is not None:
                 for subj, pred, obj in rdflib.Graph().parse(
                     self.location, format=self.fmt
@@ -245,8 +247,12 @@ class KG:
         elif vertex.name.startswith("http://") or vertex.name.startswith(
             "https://"
         ):
-            res = self.connector.fetch(self.connector.get_query(vertex.name))
-            hops = self._res2hops(vertex, res["results"]["bindings"])
+            if vertex.name in self.hops_dict:
+                res = self.connector.fetch(self.connector.get_query(vertex.name))
+                hops = self._res2hops(vertex, res["results"]["bindings"])
+                self.hops_dict[vertex.name] = hops
+            else:
+                hops = self.hops_dict[vertex.name]
         return hops
 
     def get_hops(self, vertex: Vertex, is_reverse: bool = False) -> List[Hop]:
