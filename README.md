@@ -1,0 +1,1 @@
+This repository contains a modified version of [pyRDF2Vec](https://github.com/IBCNServices/pyRDF2Vec), a "Python implementation and extension of RDF2Vec to create a 2D feature matrix from a Knowledge Graph for downstream ML tasks.".  
